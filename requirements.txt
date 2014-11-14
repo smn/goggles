@@ -1,1 +1,3 @@
-Twisted
+Twisted==14.0.2
+txRedis==2.3
+hiredis==0.1.5
