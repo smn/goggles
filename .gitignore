@@ -2,3 +2,5 @@
 *.pyc
 *.egg-info/
 /data/*
+/_trial_temp/*
+dropin.cache
