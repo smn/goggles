@@ -4,3 +4,4 @@
 /data/*
 /_trial_temp/*
 dropin.cache
+.coverage
