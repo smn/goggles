@@ -30,3 +30,11 @@ class GoggleTestCase(TestCase):
             %s
             """ % (test_db_name,))
         return d
+
+    def connect_test_db(self):
+        conn = DBConnection()
+        d = self.setup_test_db()
+        d.addCallback(lambda db_name: conn.connect('dbname=%s' % (db_name,)))
+        d.addCallback(lambda _: self.addCleanup(conn.close))
+        d.addCallback(lambda _: conn)
+        return d
