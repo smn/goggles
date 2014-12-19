@@ -7,8 +7,10 @@ install:
   - pip install -r requirements-dev.txt --use-wheel
   - pip install -e . --use-wheel
   - pip install coveralls --use-wheel
+before_script:
+  - psql -c "CREATE DATABASE goggles WITH ENCODING='UTF8' OWNER=DEFAULT TEMPLATE=template0;" -U postgres
 script:
-  - ./run_tests.sh 
+  - ./run_tests.sh
 after_success:
   - coveralls
 
