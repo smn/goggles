@@ -1,4 +1,5 @@
 from twisted.trial.unittest import TestCase
+from twisted.web.test.test_web import DummyRequest
 
 from goggles.service import DBConnection
 
@@ -38,3 +39,8 @@ class GoggleTestCase(TestCase):
         d.addCallback(lambda _: self.addCleanup(conn.close))
         d.addCallback(lambda _: conn)
         return d
+
+    def make_request(self, path='', user='user-id'):
+        request = DummyRequest([path])
+        request.getUser = lambda: user
+        return request
