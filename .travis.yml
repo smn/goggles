@@ -1,14 +1,15 @@
 language: python
 sudo: false
-cache: pip
 python:
   - "2.7"
-services:
-  - neo4j
+cache:
+  directories:
+    - $HOME/.pip-cache/
+    - /home/travis/virtualenv/python2.7
 install:
-  - pip install -r requirements-dev.txt --use-wheel
-  - pip install -e . --use-wheel
-  - pip install coveralls --use-wheel
+  - pip install -r requirements-dev.txt --download-cache $HOME/.pip-cache
+  - pip install -e . --download-cache $HOME/.pip-cache
+  - pip install coveralls --download-cache $HOME/.pip-cache
 before_script:
   - psql -c "CREATE DATABASE goggles WITH ENCODING='UTF8' OWNER=DEFAULT TEMPLATE=template0;" -U postgres
 script:
