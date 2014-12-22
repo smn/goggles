@@ -11,7 +11,6 @@ from goggles.server.auth import GoggleCredentialsChecker
 
 from twisted.cred import portal
 from twisted.internet.defer import inlineCallbacks, succeed
-from twisted.web import server
 from twisted.web.guard import BasicCredentialFactory, HTTPAuthSessionWrapper
 
 
@@ -54,7 +53,7 @@ class TestUserMessageResource(GoggleTestCase, DjangoTestMixin):
         conn = yield self.connect_test_django_db()
         job = yield self.make_job_helper(conn=conn)
         resource = UserMessageResource(job, 'inbound')
-        response = yield self.post_data(resource, sample)
+        yield self.post_data(resource, sample)
         [message] = yield job.fetch_user_messages()
         self.assertEqual(message['message_id'], sample['message_id'])
 
