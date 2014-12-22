@@ -7,3 +7,4 @@ dropin.cache
 .coverage
 htmlcov/
 *.pid
+local_settings.py
