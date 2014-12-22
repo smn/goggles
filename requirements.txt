@@ -6,3 +6,4 @@ psycopg2
 txpostgres
 dj-database-url
 iso8601
+pytz

@@ -1,13 +1,44 @@
-from twisted.web.resource import Resource
+# -*- test-case-name: goggles.server.tests.test_resource -*-
+from twisted.web import http
+from twisted.web.resource import Resource, NoResource
+from twisted.web.server import NOT_DONE_YET
+from twisted.internet import reactor
+from twisted.internet.task import deferLater
+from twisted.python import log
+
+
+class BaseResource(Resource):
+
+    def errback(self, failure, request):
+        request.setResponseCode(http.INTERNAL_SERVER_ERROR)
+        request.write(failure.getTraceback())
+        request.finish()
+
+
+class UserMessageResource(BaseResource):
+
+    def __init__(self, job, direction):
+        Resource.__init__(self)
+        self.job = job
+        self.direction = direction
+
+    def render_POST(self, request):
+        d = self.job.import_user_messages(
+            self.direction, request.content, out=request)
+        d.addCallback(lambda _: request.finish())
+        d.addErrback(self.errback, request)
+        return NOT_DONE_YET
 
 
 class GoggleResource(Resource):
 
-    debug = False
-    isLeaf = True
+    def __init__(self, job):
+        Resource.__init__(self)
+        self.inbound_resource = UserMessageResource(job, 'inbound')
+        self.outbound_resource = UserMessageResource(job, 'outbound')
 
-    def __init__(self, conn):
-        self.conn = conn
-
-    def render_GET(self, request):
-        return '%s %s' % (request.getUser(), self.conn)
+    def getChild(self, name, request):  # pragma: no cover
+        return {
+            'inbound': self.inbound_resource,
+            'outbound': self.outbound_resource,
+        }.get(name, NoResource())

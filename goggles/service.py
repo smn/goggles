@@ -5,7 +5,7 @@ from twisted.cred import portal
 from twisted.internet import reactor, endpoints
 from twisted.plugin import IPlugin
 from twisted.python import usage, log
-from twisted.web import server
+from twisted.web.server import Site, Request
 from twisted.web.guard import BasicCredentialFactory, HTTPAuthSessionWrapper
 
 import psycopg2
@@ -15,7 +15,7 @@ from txpostgres import txpostgres
 
 import dj_database_url
 
-from goggles.server.resource import GoggleResource
+from goggles.server import resource
 from goggles.server.auth import GoggleCredentialsChecker, GoggleServerRealm
 
 
@@ -30,6 +30,11 @@ def dict_connect(*args, **kwargs):
 
 class DBConnection(txpostgres.Connection):
     connectionFactory = staticmethod(dict_connect)
+
+
+class GoggleRequest(Request):
+    # Place holder because I may need to process the chunks are they arrive
+    pass
 
 
 class GoggleService(Service):
@@ -51,15 +56,14 @@ class GoggleService(Service):
         reactor.stop()
 
     def start_server(self, connection):
-        resource = GoggleResource(connection)
         checker = GoggleCredentialsChecker(connection)
-        realm = GoggleServerRealm(resource)
+        realm = GoggleServerRealm(connection, resource.GoggleResource)
         p = portal.Portal(realm, [checker])
         credentialFactory = BasicCredentialFactory("Goggles")
         protected_resource = HTTPAuthSessionWrapper(p, [credentialFactory])
 
-        site = server.Site(protected_resource)
-        # site.protocol = HTTPChannel
+        site = Site(protected_resource)
+        site.requestFactory = GoggleRequest
 
         endpoint = endpoints.serverFromString(
             reactor, self.options['endpoint'])
