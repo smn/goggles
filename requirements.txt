@@ -12,3 +12,4 @@ django-bootstrap3
 mechanize
 celery
 django-celery
+flake8

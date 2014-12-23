@@ -86,8 +86,10 @@ class Message(models.Model):
     message_id = models.CharField(max_length=255, unique=True, null=True)
     in_reply_to = models.CharField(max_length=255, null=True)
     timestamp = models.DateTimeField()
-    from_addr = models.CharField('Subscriber address', max_length=255, null=True)
-    to_addr = models.CharField('Destination address', max_length=255, null=True)
+    from_addr = models.CharField(
+        'Subscriber address', max_length=255, null=True)
+    to_addr = models.CharField(
+        'Destination address', max_length=255, null=True)
     tag_pool = models.CharField('Tag pool', null=True, max_length=255)
     tag = models.CharField('Tag', null=True, max_length=255)
     content = models.TextField(null=True)

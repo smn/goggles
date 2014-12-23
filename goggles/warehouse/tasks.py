@@ -33,7 +33,7 @@ def get_session_info(profile_pk, username, password):
                 expires_on=datetime.fromtimestamp(cookie.expires, tz=pytz.UTC),
                 status='connected')
         return profile_pk
-    except Exception, e:
+    except Exception:
         profile_query.update(status='failed')
 
 
@@ -92,4 +92,5 @@ def get_conversations(profile_pk):
 
 @shared_task
 def schedule_import_conversation(conversation_pk):
-    print 'someone wants to import', Conversation.objects.get(pk=conversation_pk)
+    conv = Conversation.objects.get(pk=conversation_pk)
+    print 'someone wants to import: %s' % (conv,)

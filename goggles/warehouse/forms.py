@@ -1,9 +1,6 @@
-import requests
-
 from django import forms
-from django.conf import settings
 
-from goggles.warehouse.models import ImportJob, Profile, Conversation
+from goggles.warehouse.models import ImportJob, Profile
 from goggles.warehouse.tasks import schedule_import_conversation
 
 

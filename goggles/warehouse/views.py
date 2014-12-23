@@ -3,13 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
-from goggles.warehouse import tasks
-from goggles.warehouse.models import Profile
 from goggles.warehouse.forms import (
     ImportJobForm, ProfileForm, ConversationActionForm)
 from goggles.warehouse.utils import update_profile_info_async
-
-from celery import chain
 
 
 def login(request):
@@ -129,7 +125,6 @@ def profile(request, pk):
 
 @login_required
 def conversation(request, pk):
-    all_conversations = request.user.conversation_set.all()
     conversation = request.user.conversation_set.get(pk=pk)
     if request.method == 'POST':
         form = ConversationActionForm(request.POST)

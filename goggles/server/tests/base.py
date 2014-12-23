@@ -1,4 +1,4 @@
-from twisted.internet.defer import inlineCallbacks, returnValue, maybeDeferred
+from twisted.internet.defer import inlineCallbacks, returnValue
 from twisted.trial.unittest import TestCase
 from twisted.web.test.test_web import DummyRequest
 
