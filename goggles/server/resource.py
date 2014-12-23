@@ -12,7 +12,7 @@ class BaseResource(Resource):
         request.finish()
 
 
-class UserMessageResource(BaseResource):
+class UploadUserMessageResource(BaseResource):
 
     def __init__(self, job, direction):
         Resource.__init__(self)
@@ -31,8 +31,8 @@ class UploadResource(Resource):
 
     def __init__(self, job):
         Resource.__init__(self)
-        self.inbound_resource = UserMessageResource(job, 'inbound')
-        self.outbound_resource = UserMessageResource(job, 'outbound')
+        self.inbound_resource = UploadUserMessageResource(job, 'inbound')
+        self.outbound_resource = UploadUserMessageResource(job, 'outbound')
 
     def getChild(self, name, request):  # pragma: no cover
         return {
@@ -41,10 +41,38 @@ class UploadResource(Resource):
         }.get(name, NoResource())
 
 
+class DownloadUserMessageResource(BaseResource):
+
+    def __init__(self, job, direction):
+        Resource.__init__(self)
+        self.job = job
+        self.direction = direction
+
+    def render_GET(self, request):
+        def cb(profile):
+            if profile is None:
+                request.setResponseCode(http.NOT_FOUND)
+            else:
+                request.write('profile: %s' % (profile,))
+            request.finish()
+
+        d = self.job.fetch_profile()
+        d.addCallback(cb)
+        return NOT_DONE_YET
+
+
 class DownloadResource(Resource):
 
     def __init__(self, job):
         Resource.__init__(self)
+        self.inbound_resource = DownloadUserMessageResource(job, 'inbound')
+        self.outbound_resource = DownloadUserMessageResource(job, 'outbound')
+
+    def getChild(self, name, request):  # pragma: no cover
+        return {
+            'inbound': self.inbound_resource,
+            'outbound': self.outbound_resource,
+        }.get(name, NoResource())
 
 
 class GoggleResource(Resource):

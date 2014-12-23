@@ -42,11 +42,13 @@ class ImportJob(models.Model):
 
     STATUS_CHOICES = (
         ('started', 'Started'),
+        ('in_progress', 'In progress'),
         ('completed', 'Completed'),
         ('failed', 'Failed'),
     )
 
     user = models.ForeignKey('auth.User', null=True)
+    profile = models.ForeignKey(Profile, null=True)
     conversation = models.ForeignKey(Conversation, null=True)
     name = models.TextField(null=True)
     username_token = models.CharField(

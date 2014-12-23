@@ -8,7 +8,7 @@ import pytz
 
 from celery import shared_task
 
-from goggles.warehouse.models import Profile, Conversation
+from goggles.warehouse.models import Profile, Conversation, ImportJob
 
 
 @shared_task
@@ -92,5 +92,14 @@ def get_conversations(profile_pk):
 
 @shared_task
 def schedule_import_conversation(conversation_pk):
+    from goggles.warehouse.utils import generate_token
     conv = Conversation.objects.get(pk=conversation_pk)
+    job = ImportJob.objects.create(
+        user=conv.user,
+        profile=conv.profile,
+        conversation=conv,
+        name='Importing %s.' % (conv.name,),
+        username_token=generate_token(),
+        password_token=generate_token())
+    print 'job', job
     print 'someone wants to import: %s' % (conv,)

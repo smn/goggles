@@ -68,3 +68,16 @@ class ImportJobHelper(object):
             SELECT * FROM warehouse_message
             WHERE import_job_id = %s
             """, (self.job_id,))
+
+    def fetch_profile(self):
+        def ix(cursor):
+            d = cursor.execute(
+                """
+                SELECT warehouse_profile.*
+                FROM warehouse_profile, warehouse_importjob
+                WHERE warehouse_importjob.id = %s
+                AND warehouse_importjob.profile_id = warehouse_profile.id
+                """, (self.job_id,))
+            d.addCallback(lambda result: result.fetchone())
+            return d
+        return self.conn.runInteraction(ix)

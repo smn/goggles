@@ -1,14 +1,91 @@
 {% extends "app.html" %}
-{% load bootstrap3 %}
+{% load humanize %}
 
 {% block content %}
-    <form action="{% url 'warehouse:profile' pk=profile.pk %}" method="post" class="form">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "star" %} Submit
-        </button>
-    {% endbuttons %}
-    </form>
+<div>
+    <div class="page-header">
+      <h1>Goggles</h1>
+    </div>
+    <ol class="breadcrumb">
+      <li><a href="{% url 'warehouse:dashboard' %}">Goggles</a></li>
+      <li class="active">{{profile}}</li>
+    </ol>
+</div>
+<div>
+    <div class="panel panel-default">
+        <div class="panel-heading">Conversations</div>
+        <div class="panel-body">
+            <p>Conversations that we know about.</p>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Profile</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conversation in conversations %}
+                <tr>
+                    <th><a href="{% url 'warehouse:conversation' pk=conversation.pk %}">{{conversation.pk}}</a></th>
+                    <th><a href="{% url 'warehouse:conversation' pk=conversation.pk %}">{{conversation.name}}</a> ({{conversation.conversation_key}})</th>
+                    <th>{{conversation.profile}}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <div class="pull-right">
+                            <a href="{% url 'warehouse:profile_new' %}">
+                                <span>profile</span>
+                                <i class="glyphicon glyphicon-plus-sign"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Import Jobs</div>
+        <div class="panel-body">
+            <p>Import jobs are data imports from Go</p>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Conversation</th>
+                    <th>Updated at</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in import_jobs %}
+                <tr>
+                    <td><a href="{% url 'warehouse:job' pk=job.pk %}">{{job.pk}}</a></td>
+                    <td><a href="{% url 'warehouse:job' pk=job.pk %}">{{job.name}}</a></td>
+                    <td>{{job.updated_at|naturalday}}</td>
+                    <td>{{job.get_status_display}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <div class="pull-right">
+                            <a href="{% url 'warehouse:job_new' %}">
+                                <span>import job</span>
+                                <i class="glyphicon glyphicon-plus-sign"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 {% endblock content %}

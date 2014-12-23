@@ -115,7 +115,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 BROKER_URL = 'django://'
-# CELERY_ALWAYS_EAGER = DEBUG
+CELERY_ALWAYS_EAGER = DEBUG
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERY_TASK_SERIALIZER = 'json'
 

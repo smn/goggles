@@ -21,9 +21,7 @@ def logout(request):
 @login_required
 def dashboard(request):
     return render(request, 'dashboard.html', {
-        'import_jobs': request.user.importjob_set.all(),
         'profiles': request.user.profile_set.all(),
-        'conversations': request.user.conversation_set.all(),
     })
 
 
@@ -101,6 +99,16 @@ def profile_new(request):
 
 @login_required
 def profile(request, pk):
+    profile = request.user.profile_set.get(pk=pk)
+    return render(request, 'profile.html', {
+        'profile': profile,
+        'import_jobs': profile.importjob_set.all(),
+        'conversations': profile.conversation_set.all(),
+    })
+
+
+@login_required
+def profile_edit(request, pk):
     profile = request.user.profile_set.get(pk=pk)
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=profile)

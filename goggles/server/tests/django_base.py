@@ -10,10 +10,20 @@ class DjangoTestMixin(object):
 
     @inlineCallbacks
     def connect_test_django_db(self):
+        """
+        NOTE:   This is a shortcut to what the Django `migrate` management
+                command does. It will only work if Django is made to believe
+                that none of the apps do migrations.
+
+                We do this by having `test_settings` point at something
+                not migrations-y in the MIGRATION_MODELS
+        """
         conn = yield self.connect_test_db()
         from django.core.management import call_command
         from django.apps import apps
 
+        # Order here is apparently important, I don't know how Django
+        # figures out the order internally.
         core_apps = [
             'contenttypes',
             'auth',

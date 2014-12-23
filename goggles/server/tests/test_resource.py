@@ -5,7 +5,7 @@ from StringIO import StringIO
 from goggles.helper import ImportJobHelper
 from goggles.server.tests.base import GoggleTestCase
 from goggles.server.tests.django_base import DjangoTestMixin
-from goggles.server.resource import GoggleResource, UserMessageResource
+from goggles.server.resource import GoggleResource, UploadUserMessageResource
 from goggles.service import GoggleServerRealm
 from goggles.server.auth import GoggleCredentialsChecker
 
@@ -34,7 +34,7 @@ class TestGoggleResource(GoggleTestCase):
             ['basic realm="Goggles"'])
 
 
-class TestUserMessageResource(GoggleTestCase, DjangoTestMixin):
+class TestUploadUserMessageResource(GoggleTestCase, DjangoTestMixin):
 
     def post_data(self, resource, data):
         request = self.make_request()
@@ -52,7 +52,7 @@ class TestUserMessageResource(GoggleTestCase, DjangoTestMixin):
         sample = self.SAMPLE_INBOUND_USER_MESSAGE
         conn = yield self.connect_test_django_db()
         job = yield self.make_job_helper(conn=conn)
-        resource = UserMessageResource(job, 'inbound')
+        resource = UploadUserMessageResource(job, 'inbound')
         yield self.post_data(resource, sample)
         [message] = yield job.fetch_user_messages()
         self.assertEqual(message['message_id'], sample['message_id'])
@@ -61,7 +61,7 @@ class TestUserMessageResource(GoggleTestCase, DjangoTestMixin):
     def test_import_bad_job_id(self):
         conn = yield self.connect_test_django_db()
         job = ImportJobHelper(conn, 'invalid_job_id')
-        resource = UserMessageResource(job, 'inbound')
+        resource = UploadUserMessageResource(job, 'inbound')
         response = yield self.post_data(
             resource, self.SAMPLE_INBOUND_USER_MESSAGE)
         [error] = response.written
@@ -70,7 +70,7 @@ class TestUserMessageResource(GoggleTestCase, DjangoTestMixin):
     @inlineCallbacks
     def test_import_bad_db_connection(self):
         job = ImportJobHelper(None, 'invalid_job_id')
-        resource = UserMessageResource(job, 'inbound')
+        resource = UploadUserMessageResource(job, 'inbound')
         response = yield self.post_data(
             resource, self.SAMPLE_INBOUND_USER_MESSAGE)
         [error] = response.written
