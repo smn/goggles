@@ -1,0 +1,40 @@
+{% extends "app.html" %}
+{% load humanize %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="well">
+    <form action="{% url 'warehouse:conversation' pk=conversation.pk %}" method="post" class="form">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} Submit
+        </button>
+    {% endbuttons %}
+    </form>
+</div>
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Existing Import Jobs</div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Conversation</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+        </thead>
+        <tbody>
+            {% for job in conversation.importjob_set.all %}
+                <tr>
+                    <td>{{job.pk}}</td>
+                    <td>{{job.conversation}}</td>
+                    <td>{{job.get_status_display}}</td>
+                    <td>{{job.updated_at|naturalday}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

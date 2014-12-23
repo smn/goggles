@@ -7,7 +7,15 @@ urlpatterns = patterns(
     '',
     url('^login/$', views.login, name='login'),
     url('^logout/$', views.logout, name='logout'),
-    url('^job/(?P<pk>\d+)/$', views.job, name='job'),
-    url('^job/(?P<pk>\d+)/edit/$', views.job_edit, name='edit_job'),
+
     url('^$', views.dashboard, name='dashboard'),
+
+    url('^job/new/$', views.job_new, name='job_new'),
+    url('^job/(?P<pk>\d+)/$', views.job, name='job'),
+    url('^job/(?P<pk>\d+)/edit/$', views.job_edit, name='job_edit'),
+
+    url('^profile/new/$', views.profile_new, name='profile_new'),
+    url('^profile/(?P<pk>\d+)/$', views.profile, name='profile'),
+
+    url('^conversation/(?P<pk>\d+)/$', views.conversation, name='conversation')
 )

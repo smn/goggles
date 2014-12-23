@@ -1,21 +1,53 @@
 from django.db import models
 
 
-STATUS_CHOICES = (
-    ('started', 'Started'),
-    ('completed', 'Completed'),
-    ('failed', 'Failed'),
-)
-
-
 class Profile(models.Model):
+
+    STATUS_CHOICES = (
+        ('disconnected', 'Disconnected'),
+        ('connecting', 'Connecting'),
+        ('connected', 'Connected'),
+        ('failed', 'Failed'),
+        ('expired', 'Expired'),
+    )
+
     user = models.ForeignKey('auth.User')
-    session_id = models.CharField(max_length=255, null=True)
+    username = models.CharField(max_length=50, null=True)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=255,
+                              null=True)
+    session_name = models.CharField(max_length=255, null=True)
+    session_value = models.CharField(max_length=255, null=True)
     session_expires = models.IntegerField(null=True)
+    expires_on = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    def __unicode__(self):
+        return self.username
+
+
+class Conversation(models.Model):
+    user = models.ForeignKey('auth.User', null=True)
+    profile = models.ForeignKey(Profile)
+    name = models.CharField(max_length=255)
+    conversation_key = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class ImportJob(models.Model):
+
+    STATUS_CHOICES = (
+        ('started', 'Started'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    )
+
     user = models.ForeignKey('auth.User', null=True)
+    conversation = models.ForeignKey(Conversation, null=True)
     name = models.TextField(null=True)
     username_token = models.CharField(
         'Username token.', max_length=255, unique=True)
