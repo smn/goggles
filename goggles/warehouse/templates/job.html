@@ -1,0 +1,35 @@
+{% extends "app.html" %}
+{% load humanize %}
+
+{% block content %}
+{% include "includes/messages.html" %}
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Messages</div>
+    <div class="panel-body">
+    <p>Messages sent & received for {{job}}</p>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Source Address</th>
+                <th>Destination Address</th>
+                <th>Direction</th>
+                <th>Timestamp</th>
+        </thead>
+        <tbody>
+            {% for message in job.message_set.all %}
+                <tr>
+                    <td>{{message.pk}}</td>
+                    <td>{{message.from_addr}}</td>
+                    <td>{{message.to_addr}}</td>
+                    <td>{{message.direction}}</td>
+                    <td>{{message.in_reply_to}}</td>
+                    <td>{{message.timestamp|naturalday}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron">
+        {% include "includes/messages.html" %}
+        <h1>Welcome to Goggles</h1>
+        <p>Suit up.</p>
+        <p><a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-success">Login with Google</a>
+    </div>
+</div>
+{% endblock content %}

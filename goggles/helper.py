@@ -35,7 +35,7 @@ class ImportJobHelper(object):
             data = self.decode(line)
             d = self.import_user_message(direction, data)
             d.addErrback(
-                lambda failure: out.write(failure.getErrorMessage()))
+                lambda failure: out.write('%s\n' % failure.getErrorMessage()))
             yield d
 
     def import_user_message(self, direction, data):
@@ -44,14 +44,20 @@ class ImportJobHelper(object):
             INSERT INTO warehouse_message (
                 import_job_id,
                 message_id,
+                to_addr,
+                from_addr,
+                in_reply_to,
                 timestamp,
                 direction,
-                content) VALUES (%s, %s, %s, %s, %s)
+                content) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
             (
                 self.job_id,
                 data['message_id'],
+                data['to_addr'],
+                data['from_addr'],
+                data['in_reply_to'],
                 data['timestamp'],
                 direction,
                 data['content']))

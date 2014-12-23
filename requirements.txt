@@ -8,3 +8,7 @@ dj-database-url
 iso8601
 pytz
 python-social-auth
+django-bootstrap3
+mechanize
+celery
+django-celery

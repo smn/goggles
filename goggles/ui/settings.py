@@ -36,8 +36,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'goggles.warehouse',
+    'django.contrib.humanize',
     'social.apps.django_app.default',
+    'bootstrap3',
+    'djcelery',
+    'kombu.transport.django',
+    'goggles.warehouse',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -109,6 +113,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+BROKER_URL = 'django://'
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERY_TASK_SERIALIZER = 'json'
 
 try:
     from local_settings import *
