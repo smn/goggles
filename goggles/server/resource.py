@@ -27,7 +27,7 @@ class UserMessageResource(BaseResource):
         return NOT_DONE_YET
 
 
-class GoggleResource(Resource):
+class UploadResource(Resource):
 
     def __init__(self, job):
         Resource.__init__(self)
@@ -38,4 +38,24 @@ class GoggleResource(Resource):
         return {
             'inbound': self.inbound_resource,
             'outbound': self.outbound_resource,
+        }.get(name, NoResource())
+
+
+class DownloadResource(Resource):
+
+    def __init__(self, job):
+        Resource.__init__(self)
+
+
+class GoggleResource(Resource):
+
+    def __init__(self, job):
+        Resource.__init__(self)
+        self.upload_resource = UploadResource(job)
+        self.download_resource = DownloadResource(job)
+
+    def getChild(self, name, request):  # pragma: no cover
+        return {
+            'upload': self.upload_resource,
+            'download': self.download_resource,
         }.get(name, NoResource())

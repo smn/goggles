@@ -1,31 +1,32 @@
+from StringIO import StringIO
+
 import django
 django.setup()
 
-from django.conf import settings
-from django.test import utils
-
-from goggles.service import DBConnection
+from twisted.internet.defer import inlineCallbacks, returnValue
 
 
 class DjangoTestMixin(object):
 
-    def setup_test_django_db(self):
-        """
-        Setup the Django test database and return the name of the test
-        database
-        """
-        runner_class = utils.get_runner(settings)
-        runner = runner_class(verbosity=False, interactive=False)
-        runner.setup_test_environment()
-        old_config = runner.setup_databases()
-        self.addCleanup(runner.teardown_databases, old_config)
-        self.addCleanup(runner.teardown_test_environment)
-        return settings.DATABASES['default']['NAME']
-
+    @inlineCallbacks
     def connect_test_django_db(self):
-        db_name = self.setup_test_django_db()
-        conn = DBConnection()
-        d = conn.connect('dbname=%s' % (db_name,))
-        d.addCallback(lambda _: self.addCleanup(conn.close))
-        d.addCallback(lambda _: conn)
-        return d
+        conn = yield self.connect_test_db()
+        from django.core.management import call_command
+        from django.apps import apps
+
+        core_apps = [
+            'contenttypes',
+            'auth',
+            'admin',
+        ]
+        for app_config in apps.get_app_configs():
+            if app_config.label not in core_apps:
+                core_apps.append(app_config.label)
+
+        for app in core_apps:
+            stdout = StringIO()
+            call_command('sqlall', app, no_color=True, stdout=stdout)
+            sql = stdout.getvalue()
+            if sql:
+                yield conn.runOperation(sql)
+        returnValue(conn)
