@@ -14,6 +14,6 @@ before_script:
   - psql -c "CREATE DATABASE goggles WITH ENCODING='UTF8' OWNER=DEFAULT TEMPLATE=template0;" -U postgres
 script:
   - ./run_tests.sh
-  - flake8 --exclude=goggles/ui/settings.py,migrations,ve .
+  - flake8 --exclude=goggles/ui/settings.py,migrations,ve,test_settings.py .
 after_success:
   - coveralls
