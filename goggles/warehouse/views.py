@@ -1,6 +1,7 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from goggles.warehouse.forms import (
@@ -30,6 +31,15 @@ def job(request, pk):
     job = request.user.importjob_set.get(pk=pk)
     return render(request, 'job.html', {
         'job': job,
+    })
+
+
+@login_required
+def job_interactions(request, pk):
+    job = request.user.importjob_set.get(pk=pk)
+    return render(request, 'job_interactions.html', {
+        'job': job,
+        'interaction_set': job.interaction_set.exclude(inbound=None)
     })
 
 
@@ -116,7 +126,7 @@ def profile_edit(request, pk):
             form.save()
             if form.cleaned_data['update_session_info']:
                 update_profile_info_async(
-                    profile,
+                    profile.pk,
                     form.cleaned_data['username'],
                     form.cleaned_data['password'])
             messages.info(

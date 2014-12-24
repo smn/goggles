@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 
 from datetime import datetime
+from itertools import tee, izip
 
-import json
 import cookielib
 import mechanize
 import requests
@@ -12,7 +12,16 @@ from celery import shared_task
 
 from django.conf import settings
 
-from goggles.warehouse.models import Profile, Conversation, ImportJob
+from goggles.warehouse.models import (
+    Profile, Conversation, ImportJob, Interaction, Message)
+
+
+def window(iterable, size):
+    iters = tee(iterable, size)
+    for i in xrange(1, size):
+        for each in iters[i:]:
+            next(each, None)
+    return izip(*iters)
 
 
 @shared_task
@@ -113,17 +122,58 @@ def schedule_import_conversation(conversation_pk):
             '%s/download/outbound' % settings.GOGGLE_SERVER_URL,
         ]
         for url in urls:
+            print url
             job.status = 'in_progress'
             job.save()
-            resp = requests.get(
+            requests.get(
                 url,
                 auth=(job.username_token, job.password_token),
                 stream=True)
-            for line in resp.iter_lines():
-                data = json.loads(line)
-                print '%s -> %s' % (url, data['message_id'])
         job.status = 'completed'
         job.save()
     except Exception:
         job.status = 'failed'
         job.save()
+
+
+@shared_task
+def link_interactions(pk):
+    job = ImportJob.objects.get(pk=pk)
+
+    outbounds = job.message_set.filter(direction='outbound')
+    for outbound in outbounds:
+        ix, _ = Interaction.objects.get_or_create(
+            import_job=job,
+            outbound=outbound)
+
+    inbounds = job.message_set.filter(direction='inbound')
+    for inbound in inbounds:
+        outbound = Message.objects.filter(
+            timestamp__lte=inbound.timestamp,
+            import_job=job,
+            from_addr=inbound.to_addr,
+            to_addr=inbound.from_addr,
+            direction='outbound').order_by('-timestamp').first()
+
+        if outbound is None:
+            continue
+
+        reply_to = Message.objects.filter(
+            direction='inbound',
+            message_id=outbound.in_reply_to).first()
+
+        if reply_to and reply_to.session_event == 'new':
+            continue
+
+        try:
+            ix = Interaction.objects.get(outbound=outbound)
+            ix.outbound = outbound
+            ix.inbound = inbound
+            ix.question = outbound.content
+            ix.response = inbound.content
+            ix.duration = (inbound.timestamp - outbound.timestamp).seconds
+            print 'Reply to %r was %r and took %r' % (
+                ix.outbound.content, ix.inbound.content, ix.duration)
+            ix.save()
+        except Interaction.DoesNotExist:
+            pass

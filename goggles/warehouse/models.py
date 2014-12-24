@@ -85,6 +85,7 @@ DIRECTION_CHOICES = (
 class Message(models.Model):
     import_job = models.ForeignKey(ImportJob, null=True)
     session = models.ForeignKey(Session, null=True)
+    session_event = models.CharField(max_length=255, null=True)
     message_id = models.CharField(max_length=255, unique=True, null=True)
     in_reply_to = models.CharField(max_length=255, null=True)
     timestamp = models.DateTimeField()
@@ -101,10 +102,23 @@ class Message(models.Model):
         ordering = ('timestamp',)
 
 
+class MessageEvent(models.Model):
+
+    import_job = models.ForeignKey(ImportJob, null=True)
+    message_id = models.CharField(max_length=255)
+    event_id = models.CharField(max_length=255)
+    event_type = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+
+
 class Interaction(models.Model):
     import_job = models.ForeignKey(ImportJob, null=True)
-    inbound = models.ForeignKey(Message, null=True, related_name='inbound')
+    inbound = models.ForeignKey(Message, unique=True, null=True,
+                                related_name='inbound')
     outbound = models.ForeignKey(Message, null=True, related_name='outbound')
-    question = models.CharField(null=True, max_length=255)
-    response = models.CharField(null=True, max_length=255)
+    question = models.TextField(null=True)
+    response = models.TextField(null=True)
     duration = models.IntegerField(null=True)
+
+    class Meta:
+        ordering = ('inbound__timestamp',)

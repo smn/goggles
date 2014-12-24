@@ -13,6 +13,8 @@ urlpatterns = patterns(
     url('^job/new/$', views.job_new, name='job_new'),
     url('^job/(?P<pk>\d+)/$', views.job, name='job'),
     url('^job/(?P<pk>\d+)/edit/$', views.job_edit, name='job_edit'),
+    url('^job/(?P<pk>\d+)/interactions/$',
+        views.job_interactions, name='job_interactions'),
 
     url('^profile/new/$', views.profile_new, name='profile_new'),
     url('^profile/(?P<pk>\d+)/edit/$',

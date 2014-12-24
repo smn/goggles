@@ -18,13 +18,13 @@
     <!-- Default panel contents -->
     <div>
         <ul class="nav nav-pills">
-          <li role="presentation" class="active"><a href="{% url 'warehouse:job' pk=job.pk %}">Messages</a></li>
-          <li role="presentation"><a href="{% url 'warehouse:job_interactions' pk=job.pk %}">Interactions</a></li>
+          <li role="presentation"><a href="{% url 'warehouse:job' pk=job.pk %}">Messages</a></li>
+          <li role="presentation" class="active"><a href="{% url 'warehouse:job_interactions' pk=job.pk %}">Interactions</a></li>
         </ul>
     </div>
     <br/>
     <div class="panel panel-default">
-        <div class="panel-heading">{{job.message_set.count}} Messages sent &amp; received by {{job.conversation}}.</div>
+        <div class="panel-heading">{{interaction_set.count}} Interactions in {{job.conversation}}.</div>
         <div class="panel-body">
             <dl class="dl-horizontal">
                 <dt>Username token</dt>
@@ -39,27 +39,21 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Session Event</th>
-                    <th>Source Address</th>
-                    <th>Destination Address</th>
-                    <th>Message ID</th>
-                    <th>In Reply To</th>
-                    <th>Direction</th>
-                    <th>Content</th>
-                    <th>Timestamp</th>
+                    <th>From Address</th>
+                    <th>To Address</th>
+                    <th>Question</th>
+                    <th>Response</th>
+                    <th>Duration (seconds)</th>
             </thead>
             <tbody>
-                {% for message in job.message_set.all %}
+                {% for interaction in interaction_set.all %}
                     <tr>
-                        <td>{{message.pk}}</td>
-                        <th>{{message.session_event}}</td>
-                        <td>{{message.from_addr}}</td>
-                        <td>{{message.to_addr}}</td>
-                        <td>{{message.message_id}}</td>
-                        <td>{{message.in_reply_to}}</td>
-                        <td>{{message.direction}}</td>
-                        <td><pre class="pre-scrollable">{{message.content|force_new_line:60}}</pre></td>
-                        <td>{{message.timestamp.isoformat}}</td>
+                        <td>{{interaction.pk}}</td>
+                        <td>{{interaction.inbound.from_addr}}</td>
+                        <td>{{interaction.inbound.to_addr}}</td>
+                        <td>{{interaction.question}}</td>
+                        <td>{{interaction.response}}</td>
+                        <td>{{interaction.duration}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
