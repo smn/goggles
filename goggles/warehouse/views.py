@@ -1,7 +1,6 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from goggles.warehouse.forms import (
