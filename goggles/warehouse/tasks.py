@@ -2,11 +2,15 @@ from __future__ import absolute_import
 
 from datetime import datetime
 
+import json
 import cookielib
 import mechanize
+import requests
 import pytz
 
 from celery import shared_task
+
+from django.conf import settings
 
 from goggles.warehouse.models import Profile, Conversation, ImportJob
 
@@ -99,7 +103,27 @@ def schedule_import_conversation(conversation_pk):
         profile=conv.profile,
         conversation=conv,
         name='Importing %s.' % (conv.name,),
+        status='started',
         username_token=generate_token(),
         password_token=generate_token())
-    print 'job', job
-    print 'someone wants to import: %s' % (conv,)
+
+    try:
+        urls = [
+            '%s/download/inbound' % settings.GOGGLE_SERVER_URL,
+            '%s/download/outbound' % settings.GOGGLE_SERVER_URL,
+        ]
+        for url in urls:
+            job.status = 'in_progress'
+            job.save()
+            resp = requests.get(
+                url,
+                auth=(job.username_token, job.password_token),
+                stream=True)
+            for line in resp.iter_lines():
+                data = json.loads(line)
+                print '%s -> %s' % (url, data['message_id'])
+        job.status = 'completed'
+        job.save()
+    except Exception:
+        job.status = 'failed'
+        job.save()

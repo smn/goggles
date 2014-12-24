@@ -25,6 +25,9 @@ setup(name='goggles',
       scripts=[],
       packages=find_packages(),
       include_package_data=True,
+      dependency_links=[
+          'https://github.com/dreid/treq/zipball/master#egg=treq-0.2.1.dev'
+      ],
       zip_safe=False,
       install_requires=requires,
       tests_require=requires)

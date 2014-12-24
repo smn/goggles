@@ -7,13 +7,12 @@ cache:
     - $HOME/.pip-cache/
     - /home/travis/virtualenv/python2.7
 install:
-  - pip install -r requirements-dev.txt --download-cache $HOME/.pip-cache
+  - pip install -r requirements-dev.txt --download-cache $HOME/.pip-cache --allow-external treq
   - pip install -e . --download-cache $HOME/.pip-cache
   - pip install coveralls --download-cache $HOME/.pip-cache
 before_script:
   - psql -c "CREATE DATABASE goggles WITH ENCODING='UTF8' OWNER=DEFAULT TEMPLATE=template0;" -U postgres
 script:
   - ./run_tests.sh
-  - flake8 --exclude=goggles/ui/settings.py,migrations,ve,test_settings.py .
 after_success:
   - coveralls

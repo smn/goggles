@@ -7,6 +7,7 @@ from datetime import datetime
 from itertools import izip, count
 
 from twisted.internet.defer import inlineCallbacks
+from twisted.python import log
 
 # This is the date format we work with internally
 VUMI_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
@@ -38,6 +39,26 @@ class ImportJobHelper(object):
                 lambda failure: out.write('%s\n' % failure.getErrorMessage()))
             yield d
 
+    def import_user_messages_chunk(self, direction, out=sys.stdout):
+
+        class Consumer():
+            def __init__(self, job_helper):
+                self.chunks = ''
+                self.job_helper = job_helper
+
+            @inlineCallbacks
+            def __call__(self, chunk):
+                self.chunks += chunk
+                while '\n' in self.chunks:
+                    line, self.chunks = self.chunks.split('\n', 1)
+                    d = self.job_helper.import_user_message(
+                        direction, json.loads(line))
+                    d.addCallback(lambda _: out.write('%s\n' % (line,)))
+                    d.addErrback(lambda f: log.msg(f.getErrorMessage()))
+                    yield d
+
+        return Consumer(self)
+
     def import_user_message(self, direction, data):
         return self.conn.runQuery(
             """
@@ -68,6 +89,30 @@ class ImportJobHelper(object):
             SELECT * FROM warehouse_message
             WHERE import_job_id = %s
             """, (self.job_id,))
+
+    def fetch_job(self):
+        def ix(cursor):
+            d = cursor.execute(
+                """
+                SELECT *
+                FROM warehouse_importjob
+                WHERE id = %s
+                """, (self.job_id,))
+            d.addCallback(lambda result: result.fetchone())
+            return d
+        return self.conn.runInteraction(ix)
+
+    def fetch_conversation(self, pk):
+        def ix(cursor):
+            d = cursor.execute(
+                """
+                SELECT *
+                FROM warehouse_conversation
+                WHERE id = %s
+                """, (pk,))
+            d.addCallback(lambda result: result.fetchone())
+            return d
+        return self.conn.runInteraction(ix)
 
     def fetch_profile(self):
         def ix(cursor):

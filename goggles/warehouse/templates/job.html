@@ -1,5 +1,6 @@
 {% extends "app.html" %}
 {% load humanize %}
+{% load extra_goggles %}
 
 {% block content %}
 <div>
@@ -16,7 +17,7 @@
 <div>
     <!-- Default panel contents -->
     <div class="panel panel-default">
-        <div class="panel-heading">Messages sent &amp; received by {{job.conversation}}.</div>
+        <div class="panel-heading">{{job.message_set.count}} Messages sent &amp; received by {{job.conversation}}.</div>
         <div class="panel-body">
             <dl class="dl-horizontal">
                 <dt>Username token</dt>
@@ -34,6 +35,7 @@
                     <th>Source Address</th>
                     <th>Destination Address</th>
                     <th>Direction</th>
+                    <th>Content</th>
                     <th>Timestamp</th>
             </thead>
             <tbody>
@@ -43,8 +45,8 @@
                         <td>{{message.from_addr}}</td>
                         <td>{{message.to_addr}}</td>
                         <td>{{message.direction}}</td>
-                        <td>{{message.in_reply_to}}</td>
-                        <td>{{message.timestamp|naturalday}}</td>
+                        <td><pre class="pre-scrollable">{{message.content|force_new_line:60}}</pre></td>
+                        <td>{{message.timestamp.isoformat}}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 
 {% block content %}
-    <form action="{% url 'warehouse:profile' pk=profile.pk %}" method="post" class="form">
+    <form action="{% url 'warehouse:profile_edit' pk=profile.pk %}" method="post" class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}

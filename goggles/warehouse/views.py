@@ -125,7 +125,7 @@ def profile_edit(request, pk):
             return redirect('warehouse:dashboard')
     else:
         form = ProfileForm(instance=profile)
-    return render(request, 'profile.html', {
+    return render(request, 'profile_edit.html', {
         'profile': profile,
         'form': form,
     })

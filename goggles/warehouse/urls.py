@@ -15,8 +15,9 @@ urlpatterns = patterns(
     url('^job/(?P<pk>\d+)/edit/$', views.job_edit, name='job_edit'),
 
     url('^profile/new/$', views.profile_new, name='profile_new'),
+    url('^profile/(?P<pk>\d+)/edit/$',
+        views.profile_edit, name='profile_edit'),
     url('^profile/(?P<pk>\d+)/$', views.profile, name='profile'),
-    url('^profile/(?P<pk>\d+)/edit/$', views.profile_edit, name='profile_edit'),
 
     url('^conversation/(?P<pk>\d+)/$', views.conversation, name='conversation')
 )
