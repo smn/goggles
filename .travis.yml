@@ -7,7 +7,8 @@ cache:
     - $HOME/.pip-cache/
     - /home/travis/virtualenv/python2.7
 install:
-  - pip install -e . --download-cache $HOME/.pip-cache --allow-all-external --allow-unverified treq
+  - pip install https://github.com/dreid/treq/zipball/master
+  - pip install -e . --download-cache $HOME/.pip-cache
   - pip install -r requirements-dev.txt --download-cache $HOME/.pip-cache
   - pip install coveralls --download-cache $HOME/.pip-cache
 before_script:
