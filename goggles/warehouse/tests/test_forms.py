@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core.management import call_command
+# from django.core.management import call_command
 
 from goggles.warehouse.forms import ConversationActionForm
 
@@ -34,7 +34,7 @@ class TestForms(TestCase):
     @mock.patch('goggles.warehouse.tasks.schedule_import_conversation.delay')
     def test_do_import_job(self, mock_task):
         # NOTE: For some reason Django 1.7 needs this.
-        call_command('migrate')
+        # call_command('migrate')
         conversation = self.mk_conversation()
         form = ConversationActionForm()
         self.assertEqual(

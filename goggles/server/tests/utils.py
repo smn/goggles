@@ -1,7 +1,5 @@
 # https://gist.github.com/NotSqrt/5f3c76cd15e40ef62d09
 
-from goggles.ui.settings import *
-
 
 # Disable migrations for when runnings tests, shaves 10s off of each test.
 class DisableMigrations(object):
@@ -11,5 +9,3 @@ class DisableMigrations(object):
 
     def __getitem__(self, item):
         return "notmigrations"
-
-MIGRATION_MODULES = DisableMigrations()
