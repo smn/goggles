@@ -1,10 +1,12 @@
 from goggles.server.tests.base import GoggleTestCase
 from goggles.server.tests.django_base import DjangoTestMixin
-from goggles.server.auth import GoggleCredentialsChecker
+from goggles.server.auth import GoggleCredentialsChecker, GoggleServerRealm
+from goggles.server.resource import UploadResource
 
-from twisted.internet.defer import inlineCallbacks
 from twisted.cred.credentials import UsernamePassword
 from twisted.cred.error import UnauthorizedLogin
+from twisted.internet.defer import inlineCallbacks
+from twisted.web.resource import IResource
 
 
 class TestAuth(GoggleTestCase, DjangoTestMixin):
@@ -38,3 +40,10 @@ class TestAuth(GoggleTestCase, DjangoTestMixin):
         creds = UsernamePassword('foo', 'baz')
         yield self.assertFailure(
             checker.requestAvatarId(creds), UnauthorizedLogin)
+
+    @inlineCallbacks
+    def test_request_avatar(self):
+        conn = yield self.connect_test_django_db()
+        realm = GoggleServerRealm(conn, UploadResource)
+        _, resource, _ = realm.requestAvatar('avatar-id', None, IResource)
+        self.assertTrue(isinstance(resource, UploadResource))

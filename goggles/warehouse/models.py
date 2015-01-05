@@ -22,7 +22,7 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
-    def __unicode__(self):
+    def __unicode__(self):  # pragma: no cover
         return self.username
 
 
@@ -34,7 +34,7 @@ class Conversation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
-    def __unicode__(self):
+    def __unicode__(self):  # pragma: no cover
         return self.name
 
 
@@ -62,7 +62,7 @@ class ImportJob(models.Model):
     class Meta:
         ordering = ('-created_at',)
 
-    def __unicode__(self):
+    def __unicode__(self):  # pragma: no cover
         return u':'.join([self.username_token, self.password_token])
 
 
@@ -72,7 +72,7 @@ class Session(models.Model):
     started_at = models.DateTimeField(null=True)
     ended_at = models.DateTimeField(null=True)
 
-    def __unicode__(self):
+    def __unicode__(self):  # pragma: no cover
         return self.session_id
 
 

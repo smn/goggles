@@ -123,5 +123,5 @@ GOGGLE_SERVER_URL = 'http://localhost:8080'
 
 try:
     from local_settings import *
-except ImportError:
+except ImportError:  # pragma: no cover
     pass

@@ -42,4 +42,4 @@ class GoggleServerRealm(object):
                     self.resource_class(
                         ImportJobHelper(self.conn, avatar_id)),
                     lambda: None)
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover

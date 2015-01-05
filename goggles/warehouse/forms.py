@@ -39,4 +39,4 @@ class ConversationActionForm(forms.Form):
 
     def do_import_job(self, conversation):
         schedule_import_conversation.delay(conversation.pk)
-        return 'Starting a import job for %s' % (conversation.name,)
+        return 'Starting an import job for %s' % (conversation.name,)

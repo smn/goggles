@@ -3,3 +3,4 @@ pytest-cov
 pytest-xdist
 sphinx
 sphinx_rtd_theme
+mock
