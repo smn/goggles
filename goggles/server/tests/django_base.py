@@ -3,15 +3,13 @@ from StringIO import StringIO
 import django
 django.setup()
 
-from django.test import SimpleTestCase
-
 import pytest
 
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 
 @pytest.mark.twisted_django
-class DjangoTestMixin(SimpleTestCase):
+class DjangoTestMixin(object):
 
     @inlineCallbacks
     def connect_test_django_db(self):
