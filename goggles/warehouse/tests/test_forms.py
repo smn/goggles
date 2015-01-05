@@ -33,6 +33,7 @@ class TestForms(TestCase):
 
     @mock.patch('goggles.warehouse.tasks.schedule_import_conversation.delay')
     def test_do_import_job(self, mock_task):
+        # NOTE: For some reason Django 1.7 needs this.
         call_command('migrate')
         conversation = self.mk_conversation()
         form = ConversationActionForm()
