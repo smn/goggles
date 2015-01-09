@@ -5,7 +5,8 @@ from StringIO import StringIO
 from goggles.helper import ImportJobHelper
 from goggles.server.tests.base import GoggleTestCase
 from goggles.server.tests.django_base import DjangoTestMixin
-from goggles.server.resource import GoggleResource, UploadUserMessageResource
+from goggles.server.resource import (
+    GoggleResource, UploadUserMessageResource, DownloadUserMessageResource)
 from goggles.service import GoggleServerRealm
 from goggles.server.auth import GoggleCredentialsChecker
 
@@ -51,17 +52,17 @@ class TestUploadUserMessageResource(GoggleTestCase, DjangoTestMixin):
     def test_import(self):
         sample = self.SAMPLE_INBOUND_USER_MESSAGE
         conn = yield self.connect_test_django_db()
-        job = yield self.make_job_helper(conn=conn)
-        resource = UploadUserMessageResource(job, 'inbound')
+        job_helper = yield self.make_job_helper(conn=conn)
+        resource = UploadUserMessageResource(job_helper, 'inbound')
         yield self.post_data(resource, sample)
-        [message] = yield job.fetch_user_messages()
+        [message] = yield job_helper.fetch_user_messages()
         self.assertEqual(message['message_id'], sample['message_id'])
 
     @inlineCallbacks
     def test_import_bad_job_id(self):
         conn = yield self.connect_test_django_db()
-        job = ImportJobHelper(conn, 'invalid_job_id')
-        resource = UploadUserMessageResource(job, 'inbound')
+        job_helper = ImportJobHelper(conn, 'invalid_job_id')
+        resource = UploadUserMessageResource(job_helper, 'inbound')
         response = yield self.post_data(
             resource, self.SAMPLE_INBOUND_USER_MESSAGE)
         [error] = response.written
@@ -69,10 +70,33 @@ class TestUploadUserMessageResource(GoggleTestCase, DjangoTestMixin):
 
     @inlineCallbacks
     def test_import_bad_db_connection(self):
-        job = ImportJobHelper(None, 'invalid_job_id')
-        resource = UploadUserMessageResource(job, 'inbound')
+        job_helper = ImportJobHelper(None, 'invalid_job_id')
+        resource = UploadUserMessageResource(job_helper, 'inbound')
         response = yield self.post_data(
             resource, self.SAMPLE_INBOUND_USER_MESSAGE)
         [error] = response.written
         self.assertTrue(
             "'NoneType' object has no attribute 'runQuery'" in error)
+
+
+class TestDownloadUserMessageResource(GoggleTestCase, DjangoTestMixin):
+
+    def get_data(self, resource):
+        request = self.make_request()
+        resource.content = StringIO('')
+        resource.render_GET(request)
+        if request.finished:
+            return succeed(request)
+
+        d = request.notifyFinish()
+        d.addCallback(lambda _: request)
+        return d
+
+    @inlineCallbacks
+    def test_download_inbound(self):
+        conn = yield self.connect_test_django_db()
+        job_helper = yield self.make_job_helper(conn=conn)
+        resource = DownloadUserMessageResource(job_helper, 'inbound')
+        response = yield self.get_data(resource)
+        print response.responseCode
+        print '%s' % (response.written,)
